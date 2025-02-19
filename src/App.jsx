@@ -6,6 +6,10 @@ function App() {
   const [todo, setTodo] = useState({
     title: '',
   });
+  const [targetId, setTargetId] = useState('');
+  const [editTodo, setEditTodo] = useState({
+    title: '',
+  });
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -22,7 +26,28 @@ function App() {
   console.log('todos', todos);
 
   const onSubmitHandler = async (todo) => {
-    await axios.post('http://localhost:4000/todos', todo);
+    const { data } = await axios.post('http://localhost:4000/todos', todo);
+    // console.log('response =>', response);
+    setTodos([...todos, data]);
+  };
+
+  const onDeletehandler = async (id) => {
+    await axios.delete(`http://localhost:4000/todos/${id}`);
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  const onEditHandler = async (targetId, editTodo) => {
+    await axios.patch(`http://localhost:4000/todos/${targetId}`, editTodo);
+    const newTodos = todos.map((todo) => {
+      if (todo.id === targetId) {
+        return {
+          ...todo,
+          title: editTodo.title,
+        };
+      }
+      return todo;
+    });
+    setTodos(newTodos);
   };
   return (
     <>
@@ -34,6 +59,31 @@ function App() {
             onSubmitHandler(todo);
           }}
         >
+          {/* 수정 UI */}
+          <div>
+            <input
+              type="text"
+              placeholder="수정하고 싶은 Todo ID를 입력"
+              onChange={(e) => {
+                setTargetId(e.target.value);
+              }}
+            />
+            <input
+              type="text"
+              placeholder="수정할 값 입력"
+              onChange={(e) => {
+                setEditTodo({ ...editTodo, title: e.target.value });
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => onEditHandler(targetId, editTodo)}
+            >
+              수정하기
+            </button>
+          </div>
+          {/* 수정 UI */}
+
           <input
             type="text"
             onChange={(e) => {
@@ -41,6 +91,16 @@ function App() {
             }}
           />
           <button type="submit">추가하기</button>
+          {todos?.map((todo) => {
+            return (
+              <div key={todo.id}>
+                <span>{todo.title}</span>{' '}
+                <button type="button" onClick={() => onDeletehandler(todo.id)}>
+                  삭제
+                </button>
+              </div>
+            );
+          })}
         </form>
       </div>
     </>
