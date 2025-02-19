@@ -1,24 +1,19 @@
 {
   "todos": [
     {
-      "id": "dfed",
-      "title": "바뀐값"
+      "id": "1",
+      "title": "리액트 공부",
+      "isDone": true
     },
     {
-      "id": "00b6",
-      "title": "333"
+      "id": "afd1",
+      "title": "스프링 공부하기",
+      "isDone": false
     },
     {
-      "id": "570f",
-      "title": "test2"
-    },
-    {
-      "id": "2656",
-      "title": "test3"
-    },
-    {
-      "id": "38eb",
-      "title": "수정값"
+      "id": "da4e",
+      "title": "SQL 공부하기",
+      "isDone": false
     }
   ]
 }
