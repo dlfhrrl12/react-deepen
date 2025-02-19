@@ -1,22 +1,29 @@
 import { useEffect } from 'react';
+import { useState } from 'react';
 
 function App() {
+  const [post, setPost] = useState(null);
+
   useEffect(() => {
-    Promise.all([
-      fetch('https://jsonplaceholder.typicode.com/todos/1').then((response) =>
-        response.json()
-      ),
-      fetch('https://jsonplaceholder.typicode.com/todos/2').then((response) =>
-        response.json()
-      ),
-    ]).then(([response1, response2]) => {
-      console.log('response =>', response1);
-      console.log('response =>', response2);
-    });
+    const fetchPost = async () => {
+      try {
+        const response = await fetch(
+          'https://jsonplaceholder.typicode.com/todos/1'
+        );
+        const data = await response.json();
+        setPost(data);
+      } catch (error) {
+        console.error('Error! => ', error);
+      }
+    };
+
+    fetchPost();
   }, []);
+  console.log('post', post);
   return (
     <>
-      <div></div>
+      <h3>async / await 연습</h3>
+      {post ? <div>{post.title}</div> : <div>Loading...</div>}
     </>
   );
 }
