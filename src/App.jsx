@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import api from './axios/api';
 
 function App() {
   const [todos, setTodos] = useState(null);
@@ -14,7 +15,7 @@ function App() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const { data } = await axios('http://localhost:4000/todos');
+        const { data } = await api.get('/todos');
         setTodos(data);
       } catch (error) {
         console.error('Error => ', error);
@@ -26,18 +27,18 @@ function App() {
   console.log('todos', todos);
 
   const onSubmitHandler = async (todo) => {
-    const { data } = await axios.post('http://localhost:4000/todos', todo);
+    const { data } = await api.post('/todos', todo);
     // console.log('response =>', response);
     setTodos([...todos, data]);
   };
 
   const onDeletehandler = async (id) => {
-    await axios.delete(`http://localhost:4000/todos/${id}`);
+    await api.delete(`/todos/${id}`);
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
   const onEditHandler = async (targetId, editTodo) => {
-    await axios.patch(`http://localhost:4000/todos/${targetId}`, editTodo);
+    await api.patch(`/todos/${targetId}`, editTodo);
     const newTodos = todos.map((todo) => {
       if (todo.id === targetId) {
         return {
