@@ -3,108 +3,41 @@ import { useEffect, useState } from 'react';
 import api from './axios/api';
 
 function App() {
-  const [todos, setTodos] = useState(null);
-  const [todo, setTodo] = useState({
-    title: '',
-  });
-  const [targetId, setTargetId] = useState('');
-  const [editTodo, setEditTodo] = useState({
-    title: '',
-  });
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
         const { data } = await api.get('/todos');
-        setTodos(data);
+        setData(data);
       } catch (error) {
-        console.error('Error => ', error);
+        setError(error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchPost();
   }, []);
-  console.log('todos', todos);
 
-  const onSubmitHandler = async (todo) => {
-    const { data } = await api.post('/todos', todo);
-    // console.log('response =>', response);
-    setTodos([...todos, data]);
-  };
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error : {error.message}</div>;
 
-  const onDeletehandler = async (id) => {
-    await api.delete(`/todos/${id}`);
-    setTodos(todos.filter((todo) => todo.id !== id));
-  };
-
-  const onEditHandler = async (targetId, editTodo) => {
-    await api.patch(`/todos/${targetId}`, editTodo);
-    const newTodos = todos.map((todo) => {
-      if (todo.id === targetId) {
-        return {
-          ...todo,
-          title: editTodo.title,
-        };
-      }
-      return todo;
-    });
-    setTodos(newTodos);
-  };
   return (
-    <>
-      <div>
-        <h3>axios 연습 </h3>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSubmitHandler(todo);
-          }}
-        >
-          {/* 수정 UI */}
-          <div>
-            <input
-              type="text"
-              placeholder="수정하고 싶은 Todo ID를 입력"
-              onChange={(e) => {
-                setTargetId(e.target.value);
-              }}
-            />
-            <input
-              type="text"
-              placeholder="수정할 값 입력"
-              onChange={(e) => {
-                setEditTodo({ ...editTodo, title: e.target.value });
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => onEditHandler(targetId, editTodo)}
-            >
-              수정하기
-            </button>
-          </div>
-          {/* 수정 UI */}
-
-          <input
-            type="text"
-            onChange={(e) => {
-              setTodo({ ...todo, title: e.target.value });
-            }}
-          />
-          <button type="submit">추가하기</button>
-          {todos?.map((todo) => {
-            return (
-              <div key={todo.id}>
-                <span>{todo.title}</span>{' '}
-                <button type="button" onClick={() => onDeletehandler(todo.id)}>
-                  삭제
-                </button>
-              </div>
-            );
-          })}
-        </form>
-      </div>
-    </>
+    <div>
+      <h1>Fetched Data</h1>
+      <ul>
+        {data &&
+          data.map((item) => (
+            <li key={item.id}>
+              <h2>{item.title}</h2>
+              <p>{item.isDone ? 'Done' : 'Not Done'}</p>
+            </li>
+          ))}
+      </ul>
+    </div>
   );
 }
 
