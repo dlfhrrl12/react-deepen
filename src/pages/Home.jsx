@@ -1,51 +1,36 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import _ from 'lodash';
+import { useCallback, useState } from 'react';
 
 const Home = () => {
-  const navigate = useNavigate();
-  let timerId = null;
+  const [searchText, setSearchText] = useState('');
+  const [inputText, setInputText] = useState('');
 
-  const throttling = (delay) => {
-    if (timerId) {
-      return;
-    }
-    console.log(`API요청 실행! ${delay}ms 동안 추가요청 안반음`);
+  const handleSearchText = useCallback(
+    _.debounce((text) => setSearchText(text), 2000),
+    []
+  );
 
-    timerId = setTimeout(() => {
-      console.log(`${delay}ms 지남 추가 요청 받음!`);
-      timerId = null;
-    }, delay);
+  const handleChange = (e) => {
+    setInputText(e.target.value);
+    handleSearchText(e.target.value);
   };
-
-  const debounce = (delay) => {
-    if (timerId) {
-      clearTimeout(timerId);
-    }
-    timerId = setTimeout(() => {
-      console.log(`마지막 요청으로부터 ${delay}ms 지났으므로 API 요청 실행`);
-      timerId = null;
-    }, delay);
-  };
-
-  const handleMove = () => {
-    navigate('/company');
-  };
-
-  useEffect(() => {
-    return () => {
-      if (timerId) {
-        clearTimeout(timerId);
-      }
-    };
-  }, []);
   return (
-    <div>
-      <h2>Button 이벤트 예제</h2>
-      <button onClick={() => throttling(2000)}>쓰로틀링 버튼</button>
-      <button onClick={() => debounce(2000)}>디바운싱 버튼</button>
-      <div>
-        <button onClick={handleMove}>페이지 이동</button>
-      </div>
+    <div
+      style={{
+        paddingLeft: 20,
+        paddingRight: 20,
+      }}
+    >
+      <h2>디바운싱 예제</h2>
+      <br />
+      <input
+        placeholder="입력값을 넣고 디바운싱 테스트를 해보세요."
+        style={{ width: '300px' }}
+        onChange={handleChange}
+        type="text"
+      />
+      <p>Search Text: {searchText}</p>
+      <p>input Text: {inputText}</p>
     </div>
   );
 };
